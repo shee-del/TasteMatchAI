@@ -7,3 +7,4 @@ joblib
 supabase
 python-dotenv
 requests
+plotly
