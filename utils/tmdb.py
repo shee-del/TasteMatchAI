@@ -3,20 +3,19 @@ import requests
 import streamlit as st
 from dotenv import load_dotenv
 
-# Load local environment variables
 load_dotenv()
 
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+# Read the key from Streamlit Cloud Secrets or local .env
+TMDB_API_KEY = (
+    st.secrets.get("TMDB_API_KEY", "")
+    or os.getenv("TMDB_API_KEY", "")
+)
 
 BASE_URL = "https://api.themoviedb.org/3"
 IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
 
 def search_movie_poster(movie_title):
-    """
-    Search TMDB for a movie and return its poster URL.
-    """
-
     if not TMDB_API_KEY or not movie_title:
         return None
 
@@ -27,7 +26,7 @@ def search_movie_poster(movie_title):
                 "api_key": TMDB_API_KEY,
                 "query": movie_title
             },
-            timeout=10
+            timeout=15
         )
 
         response.raise_for_status()
@@ -40,7 +39,7 @@ def search_movie_poster(movie_title):
             if poster_path:
                 return f"{IMAGE_BASE_URL}{poster_path}"
 
-    except requests.RequestException:
-        return None
+    except requests.RequestException as e:
+        print(f"TMDB error: {e}")
 
     return None
